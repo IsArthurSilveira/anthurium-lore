@@ -29,6 +29,7 @@ export interface Board {
 interface LoreContextType {
   loreItems: LoreItem[];
   addLoreItem: (item: Omit<LoreItem, "id" | "createdAt">) => void;
+  updateLoreItem: (id: string, updatedFields: Partial<Omit<LoreItem, "id" | "createdAt">>) => void; // Adicionado aqui!
   boards: Board[];
   addBoard: (name: string) => void;
   updateBoardNotes: (boardId: string, notes: WhiteboardNote[]) => void;
@@ -61,6 +62,15 @@ export function LoreProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("anthurium_lore_db", JSON.stringify(updated));
   };
 
+  // Nova função: Atualiza os dados de um Card Inline (Alquimia do Conhecimento)
+  const updateLoreItem = (id: string, updatedFields: Partial<Omit<LoreItem, "id" | "createdAt">>) => {
+    const updatedItems = loreItems.map((item) =>
+      item.id === id ? { ...item, ...updatedFields } : item
+    );
+    setLoreItems(updatedItems);
+    localStorage.setItem("anthurium_lore_db", JSON.stringify(updatedItems));
+  };
+
   // Funções do Quadro Branco (Miro)
   const addBoard = (name: string) => {
     const newBoard: Board = {
@@ -89,7 +99,7 @@ export function LoreProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <LoreContext.Provider value={{ loreItems, addLoreItem, boards, addBoard, updateBoardNotes, deleteBoard }}>
+    <LoreContext.Provider value={{ loreItems, addLoreItem, updateLoreItem, boards, addBoard, updateBoardNotes, deleteBoard }}>
       {children}
     </LoreContext.Provider>
   );
